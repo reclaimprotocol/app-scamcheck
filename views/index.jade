@@ -1,0 +1,41 @@
+doctype html
+html
+  head
+    title Red Button Page
+    style.
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #F5F5F5;
+        font-family: Arial, sans-serif;
+      }
+
+      .button {
+        width: 200px;
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: red;
+        border-radius: 50%;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        outline: none;
+      }
+
+      .button:hover {
+        background-color: #FF0000;
+      }
+
+      .button:active {
+        background-color: #990000;
+      }
+  body
+    form(action="/checks", method="post") 
+      button.button() Click Me
+

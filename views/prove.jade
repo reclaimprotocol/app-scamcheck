@@ -1,0 +1,14 @@
+doctype html
+html
+  head
+    title Country Select Form
+  body
+    form(action='/checks/#{checkId}/prove' method='POST')
+      select(name='country')
+        option(value='IN') India
+        option(value='usa' disabled) USA
+        option(value='canada' disabled) Canada
+        option(value='mexico' disabled) Mexico
+        option(value='uk' disabled) UK
+        option(value='australia' disabled) Australia
+      button(type='submit') Submit

@@ -1,0 +1,40 @@
+doctype html
+html
+  head
+    title Clipboard Link and Data Table
+    style.
+      table, th, td {
+        border: 1px solid black;
+      }
+      #copy-link {
+        cursor: pointer;
+        color: blue;
+        text-decoration: underline;
+      }
+  body
+    a#copy-link(href='/checks/#{check.checkId}/prove' onclick='copyToClipboard()') Copy this link
+    br
+    #loading-msg Loading...
+    p Country: #{check.data.country}
+    p #{JSON.stringify(check.data.proofParams)}
+    table#data-table(hidden)
+      tr
+        td Data 1
+        td Data 2
+    script.
+      let data = {};
+      
+      if(Object.keys(data).length === 0) {
+        document.getElementById('loading-msg').innerText = 'Loading...';
+      } else {
+        document.getElementById('loading-msg').style.display = 'none';
+        document.getElementById('data-table').removeAttribute('hidden');
+      }
+
+      function copyToClipboard() {
+        navigator.clipboard.writeText(location.href)
+          .then(() => alert('Link copied to clipboard!'))
+          .catch(err => console.error('Failed to copy text: ', err));
+      }
+
+      setInterval(() => location.reload(), 5000);
