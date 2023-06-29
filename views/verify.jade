@@ -15,22 +15,19 @@ html
     a#copy-link(href='/checks/#{check.checkId}/prove' onclick='copyToClipboard()') Copy this link
     br
     #loading-msg Loading...
-    p Country: #{check.data.country}
-    p #{JSON.stringify(check.data.proofParams)}
-    table#data-table(hidden)
-      tr
-        td Data 1
-        td Data 2
-    script.
-      let data = {};
-      
-      if(Object.keys(data).length === 0) {
-        document.getElementById('loading-msg').innerText = 'Loading...';
-      } else {
-        document.getElementById('loading-msg').style.display = 'none';
-        document.getElementById('data-table').removeAttribute('hidden');
-      }
+    if check.data.country
+      p Verification Initiated, please wait for them to upload the proofs 
+      p User is in #{check.data.country}
+    if check.data.proofParams
+      table#data-table
+      for param in check.data.proofParams
+        tr
+          td #{Object.keys(param)[0]}
+          td #{Object.values(param)[0]}
 
+
+    p #{JSON.stringify(check.data)}
+    script.
       function copyToClipboard() {
         navigator.clipboard.writeText(location.href)
           .then(() => alert('Link copied to clipboard!'))

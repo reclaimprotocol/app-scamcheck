@@ -24,6 +24,8 @@ router.get('/checks/:checkId/prove', async (req, res) => {
 
 router.post('/checks/:checkId/prove', async (req, res) => {
   const check = await Check.findOne({ checkId: req.params.checkId });
+  if(!check)
+    return res.render('error', { message : "Invalid URL, please check." });
   check.data = { country: req.body.country };
   await check.save();
   
@@ -32,6 +34,8 @@ router.post('/checks/:checkId/prove', async (req, res) => {
 
 router.get('/checks/:checkId/zkprove', async (req, res) => {
   const check = await Check.findOne({ checkId: req.params.checkId });
+  if(!check)
+    return res.render('error', { message : "Invalid URL, please check." });
   const { country } = check.data;
   if (country === 'IN') {
     const request = reclaim.requestProofs({
@@ -55,16 +59,17 @@ router.get('/checks/:checkId/zkprove', async (req, res) => {
 });
 
 router.post('/checks/zkprove', bodyParser.text("*/*"), async (req, res) => {
-  console.log(Object.keys(req.body)[0]);
   const callbackId = req.query.id;
   const check = await Check.findOne({ checkId: callbackId });
-  check.data.proofs = JSON.parse(Object.keys(req.body)[0]).proofs;
+  if(!check)
+    return res.render('error', { message : "Invalid URL, please check." });
+  check.data = { ...check.data, proofs: JSON.parse(Object.keys(req.body)[0]).proofs};
   await check.save();
   
   const onChainClaimIds = reclaim.getOnChainClaimIdsFromProofs(check.data.proofs);
   const isProofsCorrect = await reclaim.verifyCorrectnessOfProofs(check.data.proofs);
   if (isProofsCorrect) {
-    check.data.proofParams = check.data.proofs.map(proof => proof.parameters);
+    check.data = {...check.data, proofParams: check.data.proofs.map(proof => proof.parameters)};
   }
   await check.save();
   res.redirect(`/checks/${check.checkId}/verify`);
@@ -74,7 +79,10 @@ router.post('/checks/zkprove', bodyParser.text("*/*"), async (req, res) => {
 
 router.get('/checks/:checkId/verify', async (req, res) => {
   const check = await Check.findOne({ checkId: req.params.checkId });
-  res.render('verify', {check});
+  if(check)
+    res.render('verify', {check});
+  else
+    res.render('error', { message : "Invalid URL, please check." });
 });
 
 
