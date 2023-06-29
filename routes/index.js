@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var {Check} = require('../models/Check');
 const { reclaimprotocol } = require( '@reclaimprotocol/reclaim-sdk');
+const bodyParser = require('body-parser');
 const reclaim = new reclaimprotocol.Reclaim();
 
 /* GET home page. */
@@ -53,18 +54,20 @@ router.get('/checks/:checkId/zkprove', async (req, res) => {
   res.render('zkprove', {check, request});
 });
 
-router.post('/checks/zkprove', async (req, res) => {
+router.post('/checks/zkprove', bodyParser.text("*/*"), async (req, res) => {
+  console.log(Object.keys(req.body)[0]);
   const callbackId = req.query.id;
   const check = await Check.findOne({ checkId: callbackId });
-  check.data.proofs = req.body;
+  check.data.proofs = JSON.parse(Object.keys(req.body)[0]).proofs;
   await check.save();
+  
   const onChainClaimIds = reclaim.getOnChainClaimIdsFromProofs(check.data.proofs);
   const isProofsCorrect = await reclaim.verifyCorrectnessOfProofs(check.data.proofs);
   if (isProofsCorrect) {
     check.data.proofParams = check.data.proofs.map(proof => proof.parameters);
   }
   await check.save();
-  res.redirect(`/checks/${check.sessionId}/verify`);
+  res.redirect(`/checks/${check.checkId}/verify`);
 });
 
 
